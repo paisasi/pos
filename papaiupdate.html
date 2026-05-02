@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>PaiPosPro - Grand Full Menu v30</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* --- Theme System --- */
+        :root { 
+            --bg-page: #F8FAFC; --primary: #2563EB; --accent: #DBEAFE; 
+            --text: #0F172A; --card: #FFFFFF; --border: #E2E8F0; 
+            --danger: #DC2626; --success: #059669; --secondary: #475569; 
+        }
+        body.theme-cute { --bg-page: #FFF5F7; --primary: #E11D48; --accent: #FFE4E6; --text: #4C0519; --card: #FFFFFF; --border: #FDA4AF; }
+        body.theme-berry { --bg-page: #FAF5FF; --primary: #7C3AED; --accent: #F3E8FF; --text: #2E1065; --card: #FFFFFF; --border: #D8B4FE; }
+        body.theme-midnight { --bg-page: #020617; --primary: #38BDF8; --accent: #1E293B; --text: #F8FAFC; --card: #0F172A; --border: #334155; }
+        body.theme-nature { --bg-page: #F0FDF4; --primary: #16A34A; --accent: #DCFCE7; --text: #064E3B; --card: #FFFFFF; --border: #86EFAC; }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Kanit', sans-serif; margin: 0; padding: 0; }
+        body { 
+            background: var(--bg-page); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; transition: background 0.3s;
+            -webkit-user-select: none; user-select: none;
+        }
+
+        header { flex-shrink: 0; background: var(--card); padding: 8px 12px; display: grid; grid-template-columns: 1.2fr 1fr; gap: 8px; border-bottom: 1px solid var(--border); z-index: 50; }
+        .stat-card { background: var(--bg-page); padding: 5px; border-radius: 10px; text-align: center; border: 1px solid var(--border); }
+        .stat-card span { font-size: 0.6em; color: var(--primary); font-weight: 600; display: block; }
+        .stat-card b { font-size: 1.1em; color: var(--text); }
+        .stat-primary { background: var(--primary); color: white; border: none; }
+        .stat-primary b, .stat-primary span { color: white; }
+
+        .main-content { flex: 1; overflow-y: scroll; -webkit-overflow-scrolling: touch; padding: 10px; padding-bottom: 120px; scrollbar-width: none; }
+        .main-content::-webkit-scrollbar { display: none; }
+
+        .cat-bar { display: flex; overflow-x: auto; gap: 6px; padding-bottom: 8px; scrollbar-width: none; }
+        .cat-btn { padding: 8px 15px; border-radius: 10px; background: var(--card); color: var(--text); font-size: 0.75em; font-weight: 500; border: 1px solid var(--border); white-space: nowrap; cursor: pointer; }
+        .cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+        .item-btn { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 95px; text-align: center; cursor: pointer; overflow: hidden; color: var(--text); position: relative; }
+        .img-wrap { width: 100%; height: 55px; background: rgba(0,0,0,0.03); border-radius: 6px; margin-bottom: 3px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .item-btn img { height: 100%; width: 100%; object-fit: contain; }
+        .item-btn span { font-size: 0.62em; font-weight: 500; line-height: 1.1; height: 2.2em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; width: 100%; }
+        .item-btn b { color: var(--primary); font-size: 0.68em; margin-top: 1px; }
+        .item-btn.active { border: 2px solid var(--primary); background: var(--accent); }
+
+        /* Sweetness Level */
+        .sweet-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 10px; }
+        .sweet-btn { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 6px 2px; text-align: center; cursor: pointer; font-size: 0.65em; }
+        .sweet-btn b { display: block; font-size: 1.1em; color: var(--primary); }
+        .sweet-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .sweet-btn.active b { color: white !important; }
+
+        .action-card { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; background: var(--card); padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
+        .qty-btn { width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-page); color: var(--text); font-size: 1.5em; cursor: pointer; }
+        .btn-add { background: var(--success); color: white; padding: 10px 18px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; }
+
+        .checkout-section { background: var(--card); border-radius: 15px; padding: 15px; margin-top: 15px; border: 2px solid var(--primary); }
+        .sum-row { display: flex; justify-content: space-between; font-weight: 700; font-size: 1.5em; padding: 10px 0; border-top: 1px solid var(--border); }
+
+        /* Modern Receipt Style */
+        .receipt-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 12px; font-size: 0.85em; position: relative; overflow: hidden; }
+        .receipt-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; }
+        .receipt-card.cash-side::before { background: var(--success); }
+        .receipt-card.transfer-side::before { background: var(--primary); }
+        
+        .receipt-header { border-bottom: 1px dashed var(--border); padding-bottom: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .receipt-item-row { display: flex; justify-content: space-between; margin-bottom: 6px; align-items: flex-start; }
+        .receipt-item-info { flex: 1; padding-right: 10px; }
+        .receipt-item-price { font-weight: 600; min-width: 60px; text-align: right; }
+        .receipt-footer { border-top: 1px solid var(--border); padding-top: 8px; margin-top: 5px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .pay-badge { font-size: 0.7em; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+        .badge-cash { background: #DCFCE7; color: var(--success); }
+        .badge-transfer { background: #DBEAFE; color: var(--primary); }
+        .void-btn { background: #FFF1F2; color: var(--danger); border: 1px solid #FECACA; padding: 5px 10px; border-radius: 8px; font-size: 0.75em; font-weight: 600; cursor: pointer; }
+
+        /* Admin / Accordion */
+        .coll-content { overflow: hidden; transition: max-height 0.3s ease-out; }
+        .coll-content.collapsed { max-height: 0 !important; }
+
+        .admin-card { background: var(--card); border-radius: 15px; padding: 15px; margin-bottom: 12px; border: 1px solid var(--border); }
+        .admin-cat-header { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--accent); border-radius: 10px; margin-top: 8px; font-weight: 600; cursor: pointer; font-size: 0.85em; }
+        .btn-sm { padding: 4px 8px; border-radius: 6px; font-size: 0.75em; cursor: pointer; border: 1px solid var(--border); background: var(--card); margin-left: 2px; }
+
+        nav { position: fixed; bottom: 0; left: 0; width: 100%; display: grid; grid-template-columns: 1fr 1fr; background: var(--card); border-top: 1px solid var(--border); padding-bottom: env(safe-area-inset-bottom); z-index: 100; }
+        .nav-btn { padding: 15px; text-align: center; color: var(--secondary); font-size: 0.9em; cursor: pointer; }
+        .nav-btn.active { color: var(--primary); background: var(--accent); font-weight: 600; }
+
+        .btn-full { width: 100%; padding: 16px; border-radius: 12px; background: var(--primary); color: white; font-weight: 700; border: none; margin-top: 10px; cursor: pointer; }
+        .hidden { display: none !important; }
+        .cash-btn { background: var(--card); border: 1px solid var(--border); padding: 10px; border-radius: 10px; text-align: center; font-weight: 600; cursor: pointer; }
+    </style>
+</head>
+<body class="theme-blue">
+
+    <header>
+        <div class="stat-card stat-primary"><span>รายได้วันนี้</span><b id="rev-total">0</b></div>
+        <div class="stat-card"><span>จำนวนแก้ว</span><b id="rev-cups">0</b></div>
+    </header>
+
+    <div id="pos-screen" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+        <div class="main-content">
+            <div class="cat-bar" id="pos-cat-bar"></div>
+            <div class="grid-5" id="pos-menu-grid"></div>
+            
+            <h5 style="margin: 15px 0 8px; font-size: 0.8em; opacity: 0.7;">🍬 ระดับความหวาน</h5>
+            <div class="sweet-grid" id="pos-sweet-grid"></div>
+
+            <h5 style="margin: 15px 0 8px; font-size: 0.8em; opacity: 0.7;">🍯 ท็อปปิ้ง (เลือกได้หลายอย่าง)</h5>
+            <div class="grid-5" id="pos-top-grid"></div>
+
+            <div class="action-card">
+                <b>จำนวน</b>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button class="qty-btn" onclick="changeQty(-1)">-</button>
+                    <b id="qty-val" style="width:20px; text-align:center;">1</b>
+                    <button class="qty-btn" onclick="changeQty(1)">+</button>
+                </div>
+                <button class="btn-add" onclick="addToCart()">+ เพิ่มลงบิล</button>
+            </div>
+
+            <div id="checkout-area" class="checkout-section hidden">
+                <h4 style="text-align: center; margin-bottom: 10px;">ชำระเงิน</h4>
+                <div id="cart-list-inline" style="font-size: 0.85em; margin-bottom: 8px;"></div>
+                <div class="sum-row"><span>ยอดสุทธิ</span><span style="color:var(--primary);">฿ <span id="cart-sum">0</span></span></div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0;">
+                    <div class="cat-btn active" style="text-align:center;" id="pay-cash" onclick="setPayMethod('cash')">💵 เงินสด</div>
+                    <div class="cat-btn" style="text-align:center;" id="pay-transfer" onclick="setPayMethod('transfer')">📱 โอนเงิน</div>
+                </div>
+
+                <div id="cash-panel">
+                    <div class="grid-5" id="smart-cash-btns" style="grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px;"></div>
+                    <input type="number" id="cash-in" style="width:100%; font-size:1.8em; text-align:right; border:1px solid var(--primary); border-radius:10px; padding:10px; color:var(--primary);" placeholder="รับเงิน" oninput="calcChange()" inputmode="decimal">
+                    <div style="background:var(--accent); padding:10px; border-radius:10px; margin-top:10px; text-align:center; font-weight:700; color:var(--primary); font-size:1.3em;">ทอน: <span id="change-val">0</span> ฿</div>
+                </div>
+                <button class="btn-full" onclick="finalizeSale()">✅ บันทึกยอดขาย</button>
+                
+                <div style="display: flex; justify-content: space-around; margin-top: 10px; font-size: 0.75em; opacity: 0.6;">
+                    <span>สด: <b id="sub-cash">0</b></span>
+                    <span>โอน: <b id="sub-transfer">0</b></span>
+                </div>
+            </div>
+
+            <div class="admin-card" style="margin-top:15px;">
+                <div class="coll-header" onclick="toggleColl('menu-rep-content', 'icon-menu')">
+                    <h5 style="color: var(--primary);">📈 สรุปยอดขายรายเมนู</h5>
+                    <span id="icon-menu">▼</span>
+                </div>
+                <div id="menu-rep-content" class="coll-content collapsed">
+                    <table style="width:100%; border-collapse:collapse; font-size:0.85em; margin-top:10px;">
+                        <thead><tr><th style="text-align:left; border-bottom:2px solid var(--border);">เมนู</th><th style="text-align:right; border-bottom:2px solid var(--border);">แก้ว</th></tr></thead>
+                        <tbody id="menu-report-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h5 style="margin: 25px 0 10px; color: var(--secondary);">🧾 ประวัติบิลล่าสุด</h5>
+            <div id="history-list"></div>
+            <div style="height: 60px;"></div>
+        </div>
+    </div>
+
+    <!-- ADMIN SCREEN -->
+    <div id="admin-screen" class="hidden" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+        <div class="main-content">
+            <div class="admin-card">
+                <h4>🛠 จัดการหมวดหมู่</h4>
+                <button class="btn-full" style="background:var(--primary);" onclick="addCategory()">+ เพิ่มหมวดหมู่ใหม่</button>
+            </div>
+            
+            <div id="admin-menu-manage"></div>
+
+            <div class="admin-card">
+                <div class="coll-header" onclick="toggleColl('admin-top-coll', 'icon-top')">
+                    <h4>🍯 จัดการท็อปปิ้ง</h4>
+                    <span id="icon-top">▼</span>
+                </div>
+                <div id="admin-top-coll" class="coll-content collapsed">
+                    <div id="admin-top-manage" style="padding-top:10px;"></div>
+                    <button class="btn-full" style="background:var(--secondary); padding:10px;" onclick="addTopAdmin()">+ เพิ่มท็อปปิ้ง</button>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h4>⚙ จัดการระบบ</h4>
+                <button class="btn-full" style="background:var(--success);" onclick="exportExcel()">📥 โหลด Excel (CSV)</button>
+                <button class="btn-full" style="background:var(--danger);" onclick="resetDay()">🔄 ล้างยอดขายเริ่มวันใหม่</button>
+                <button class="btn-full" style="background:var(--secondary); margin-top:20px;" onclick="resetToDefault()">⚠️ รีเซ็ตเมนูคืนค่าเริ่มต้น</button>
+            </div>
+        </div>
+    </div>
+
+    <nav>
+        <div id="nav-pos" class="nav-btn active" onclick="switchTab('pos')">🏠 หน้าขาย</div>
+        <div id="nav-admin" class="nav-btn" onclick="switchTab('admin')">⚙ ตั้งค่า</div>
+    </nav>
+
+    <input type="file" id="img-input" accept="image/*" class="hidden" onchange="handleImgSelected(this)">
+
+<script>
+    // --- GRAND MASSIVE DATA RESTORED ---
+    const initialMenu = {
+        'กาแฟ': [
+            {n:'เอสเพรสโซ่',p:25}, {n:'ลาเต้',p:25}, {n:'มอคค่า',p:25}, {n:'คาปูชิโน่',p:25},
+            {n:'เนสกาแฟ',p:25}, {n:'โอเลี้ยง',p:25}, {n:'กาแฟดำ',p:25}
+        ],
+        'กาแฟปั่น': [
+            {n:'เอสเพรสโซ่ปั่น',p:40}, {n:'ลาเต้ปั่น',p:40}, {n:'มอคค่าปั่น',p:40}, {n:'คาปูชิโน่ปั่น',p:40},
+            {n:'เนสกาแฟปั่น',p:40}, {n:'โอเลี้ยงปั่น',p:40}, {n:'กาแฟดำปั่น',p:40}
+        ],
+        'ชา': [
+            {n:'ชาเขียว',p:20}, {n:'ชาไทย',p:20}, {n:'ชาโกโก้',p:25}, {n:'ชานมไต้หวัน',p:20},
+            {n:'ชาเนสที',p:20}, {n:'ชามะนาว',p:20}, {n:'ชาดำ',p:20}, {n:'ชาเขียวใส',p:20},
+            {n:'ชาเขียวน้ำผึ้งมะนาว',p:20}, {n:'ชาเขียวมะนาว',p:20}, {n:'ชาพีช',p:20}
+        ],
+        'ชาเบอรี่': [
+            {n:'ชาเบอรี่',p:20}, {n:'ชาเบอรี่น้ำผึ้ง',p:20}, {n:'ชาเบอรี่มะนาว',p:20}, {n:'ชาเบอรี่โกโก้',p:25}
+        ],
+        'ชามะลิ': [
+            {n:'ชามะลิ',p:20}, {n:'ชามะลิน้ำผึ้ง',p:20}, {n:'ชามะลิสตรอเบอร์รี่',p:20},
+            {n:'ชามะลิลิ้นจี่',p:20}, {n:'ชามะลิแอปเปิ้ล',p:20}, {n:'ชามะลินม',p:20}
+        ],
+        'โซดา': [
+            {n:'แดงโซดา',p:20}, {n:'มะนาวโซดา',p:20}, {n:'แดงมะนาวโซดา',p:20}, {n:'น้ำผึ้งมะนาวโซดา',p:20}, 
+            {n:'สตรอเบอร์รี่โซดา',p:20}, {n:'ลิ้นจี่โซดา',p:20}, {n:'แอปเปิ้ลโซดา',p:20}, {n:'บลูเบอร์รี่โซดา',p:20}, 
+            {n:'กีวี่โซดา',p:20}, {n:'บลูฮาวายโซดา',p:20}, {n:'เขียวโซดา',p:20}, {n:'พีชโซดา',p:20}, 
+            {n:'ส้มโซดา',p:20}, {n:'แตงโมโซดา',p:20}, {n:'สัปปะรดโซดา',p:20}, {n:'องุ่นโซดา',p:20}, 
+            {n:'เสาวรสโซดา',p:20}, {n:'แคนตาลูปโซดา',p:20}
+        ],
+        'นม': [
+            {n:'นมสด',p:20}, {n:'นมชมพู',p:20}, {n:'โกโก้',p:25}, {n:'ช็อคโกแลต',p:25}, {n:'นมมิ้นท์',p:25},
+            {n:'สตรอเบอร์รี่นมสด',p:20}, {n:'โอวัลติน',p:20}, {n:'นมเผือก',p:20}, {n:'นมแคนตาลูป',p:20}
+        ],
+        'บราวน์ชูก้า': [
+            {n:'นมสดบราวน์ชูก้า',p:20}, {n:'ชาไต้หวันบราวน์ชูก้า',p:20},
+            {n:'ชาเขียวบราวน์ชูก้า',p:20}, {n:'ชาไทยบราวน์ชูก้า',p:20}
+        ],
+        'มะพร้าว & อเมริกาโน่': [
+            {n:'อเมริกาโน่น้ำผึ้งมะนาว',p:25}, {n:'มะพร้าวน้ำหอมใส',p:25}, {n:'อเมริกาโน่น้ำผึ้ง',p:25},
+            {n:'อเมริกาโน่',p:25}, {n:'มะพร้าวน้ำหอมนม',p:29}, {n:'มะพร้าวน้ำหอมอเมริกาโน่',p:29},
+            {n:'มะพร้าวน้ำหอมนมสดอเมริกาโน่',p:35}, {n:'มะพร้าวน้ำหอมนมสดไทย',p:35},
+            {n:'มะพร้าวน้ำหอมนมสดเขียว',p:35}, {n:'มะพร้าวน้ำหอมนมสดโกโก้',p:35}
+        ],
+        'มัทฉะ': [
+            {n:'เพียวมัทฉะ',p:35}, {n:'มัทฉะลาเต้',p:35}, {n:'มัทฉะน้ำผึ้งมะนาว',p:35},
+            {n:'มัทฉะส้ม',p:40}, {n:'มัทฉะมะพร้าวน้ำหอมใส',p:40}, {n:'มัทฉะนมสดสตรอเบอร์รี่',p:40},
+            {n:'มัทฉะนมโกโก้',p:40}, {n:'มัทฉะกาแฟ',p:40}, {n:'มัทฉะมะพร้าวน้ำหอมนม',p:45}
+        ],
+        'เมนูปั่น': [
+            {n:'นมสดโอริโอ้ปั่น',p:40}, {n:'นมหมีปั่น',p:35}, {n:'นมหมีน้ำผึ้งปั่น',p:35},
+            {n:'ชาเขียวบราวน์ชูการ์ปั่น',p:35}, {n:'ชานมไต้หวันบราวน์ชูการ์ปั่น',p:35},
+            {n:'นมสดบราวน์ชูการ์ปั่น',p:35}, {n:'ชาเขียวปั่น',p:35}, {n:'ชาไทยปั่น',p:35},
+            {n:'ชานมไต้หวันปั่น',p:35}, {n:'ชาโกโก้ปั่น',p:35}, {n:'ชาเนสทีปั่น',p:35},
+            {n:'นมสดปั่น',p:35}, {n:'นมชมพูปั่น',p:35}, {n:'โกโก้ปั่น',p:35},
+            {n:'สตรอเบอร์รี่นมสดปั่น',p:35}, {n:'โอวัลตินปั่น',p:35}, {n:'นมเผือกปั่น',p:35},
+            {n:'นมแคนตาลูปปั่น',p:35}
+        ],
+        'สตรอว์เบอรี่': [
+            {n:'โกโก้สตรอว์เบอรี่',p:35}, {n:'ชาไทยสตรอว์เบอรี่',p:35},
+            {n:'ชาเขียวสตรอว์เบอรี่',p:35}, {n:'เผือกสตรอว์เบอรี่',p:35}
+        ],
+        'อเมริกาโน่ผลไม้': [
+            {n:'อเมริกาโน่สตรอเบอร์รี่',p:29}, {n:'อเมริกาโน่ลิ้นจี่',p:29}, {n:'อเมริกาโน่แอปเปิ้ล',p:29}, {n:'อเมริกาโน่บลูเบอร์รี่',p:29},
+            {n:'อเมริกาโน่กีวี่',p:29}, {n:'อเมริกาโน่พีช',p:29}, {n:'อเมริกาโน่ส้ม',p:29}, {n:'อเมริกาโน่แตงโม',p:29}, 
+            {n:'อเมริกาโน่สัปปะรด',p:29}, {n:'อเมริกาโน่องุ่น',p:29}, {n:'อเมริกาโน่เสาวรส',p:29}
+        ]
+    };
+
+    const initialTops = [
+        {n:'ไข่มุกฟรี',p:0}, {n:'ไข่มุก',p:5}, {n:'ฟรุ๊ตสลัด',p:5},
+        {n:'บุกบราวน์',p:9}, {n:'บุกน้ำผึ้ง',p:9}, {n:'โอริโอ้',p:5}
+    ];
+
+    // --- State Logic ---
+    const DB_ID = 'paipos_v30_grand_full';
+    let drinks = JSON.parse(localStorage.getItem(DB_ID + '_menu')) || initialMenu;
+    let toppings = JSON.parse(localStorage.getItem(DB_ID + '_tops')) || initialTops;
+    let history = JSON.parse(localStorage.getItem(DB_ID + '_hist')) || [];
+    let currentTheme = localStorage.getItem(DB_ID + '_theme') || 'blue';
+
+    let cart = [], selDrink = null, selTops = [], qty = 1, currentCat = '', selSweet = '100%', payMode = 'cash', targetUpload = null;
+
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    
+    function switchTab(t) {
+        document.getElementById('pos-screen').classList.toggle('hidden', t !== 'pos');
+        document.getElementById('admin-screen').classList.toggle('hidden', t !== 'admin');
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('nav-' + t).classList.add('active');
+        if(t === 'admin') renderAdmin();
+        if(t === 'pos') renderPOS();
+    }
+
+    function toggleColl(id, iconId) {
+        const c = document.getElementById(id); const i = document.getElementById(iconId);
+        c.classList.toggle('collapsed'); i.innerText = c.classList.contains('collapsed') ? '▼' : '▲';
+    }
+
+    // --- POS Functions ---
+    function renderPOS() {
+        const catBar = document.getElementById('pos-cat-bar'); catBar.innerHTML = '';
+        Object.keys(drinks).forEach((cat, i) => {
+            const b = document.createElement('div');
+            b.className = 'cat-btn' + (currentCat === cat || (!currentCat && i===0) ? ' active' : '');
+            b.innerText = cat; b.onclick = () => { currentCat = cat; renderPOS(); };
+            catBar.appendChild(b);
+        });
+        if(!currentCat) currentCat = Object.keys(drinks)[0];
+        loadDrinks(currentCat);
+        renderSweetness();
+        renderToppings();
+        updateStats();
+    }
+
+    function renderSweetness() {
+        const grid = document.getElementById('pos-sweet-grid'); grid.innerHTML = '';
+        const opts = [{n:'0%',l:'ไม่หวาน'}, {n:'50%',l:'หวานน้อย'}, {n:'100%',l:'ปกติ'}, {n:'150%',l:'พิเศษ'}];
+        opts.forEach(opt => {
+            const b = document.createElement('div');
+            b.className = 'sweet-btn' + (selSweet === opt.n ? ' active' : '');
+            b.innerHTML = `<b>${opt.n}</b>${opt.l}`;
+            b.onclick = () => { selSweet = opt.n; renderSweetness(); };
+            grid.appendChild(b);
+        });
+    }
+
+    function loadDrinks(cat) {
+        const grid = document.getElementById('pos-menu-grid'); grid.innerHTML = '';
+        if(!drinks[cat]) return;
+        drinks[cat].forEach(m => {
+            const isSel = selDrink && selDrink.n === m.n;
+            const b = document.createElement('div'); b.className = 'item-btn' + (isSel?' active':'');
+            b.innerHTML = `<div class="img-wrap">${m.img ? `<img src="${m.img}">` : '🥤'}</div><span>${m.n}</span><b>${m.p}.-</b>`;
+            b.onclick = () => { selDrink = m; renderPOS(); };
+            grid.appendChild(b);
+        });
+    }
+
+    function renderToppings() {
+        const topGrid = document.getElementById('pos-top-grid'); topGrid.innerHTML = '';
+        toppings.forEach(t => {
+            const isSel = selTops.some(it => it.n === t.n);
+            const d = document.createElement('div'); d.className = 'item-btn' + (isSel ? ' active' : '');
+            d.innerHTML = `<div class="img-wrap">${t.img ? `<img src="${t.img}">` : '🍯'}</div><span>${t.n}</span><b>+${t.p}</b>`;
+            d.onclick = () => {
+                const idx = selTops.findIndex(it => it.n === t.n);
+                if (idx > -1) selTops.splice(idx, 1); else selTops.push(t);
+                renderToppings();
+            };
+            topGrid.appendChild(d);
+        });
+    }
+
+    function changeQty(v) { qty = Math.max(1, qty + v); document.getElementById('qty-val').innerText = qty; }
+
+    function setPayMethod(m) {
+        payMode = m;
+        document.getElementById('pay-cash').classList.toggle('active', m === 'cash');
+        document.getElementById('pay-transfer').classList.toggle('active', m === 'transfer');
+        document.getElementById('cash-panel').classList.toggle('hidden', m === 'transfer');
+        calcChange();
+    }
+
+    function addToCart() {
+        if(!selDrink) return alert('เลือกเมนูก่อนครับ');
+        const tCost = selTops.reduce((s, t) => s + t.p, 0);
+        const tNames = selTops.length > 0 ? selTops.map(t => t.n).join(',') : 'ไม่ใส่';
+        cart.push({ n: selDrink.n, p: selDrink.p, s: selSweet, tN: tNames, q: qty, total: (selDrink.p + tCost) * qty });
+        selDrink = null; selTops = []; selSweet = '100%'; qty = 1;
+        document.getElementById('qty-val').innerText = 1;
+        document.getElementById('checkout-area').classList.remove('hidden');
+        renderPOS(); renderCheckout();
+    }
+
+    function renderCheckout() {
+        const list = document.getElementById('cart-list-inline');
+        list.innerHTML = cart.map((it, idx) => `
+            <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px dotted #eee;">
+                <div><b>${it.n} x${it.q}</b> (${it.s})<br><small>+ ${it.tN}</small></div>
+                <b>${it.total}฿ <span style="color:red;" onclick="cart.splice(${idx},1);renderCheckout();">✕</span></b>
+            </div>`).join('');
+        let sum = cart.reduce((a,b) => a+b.total, 0);
+        document.getElementById('cart-sum').innerText = sum;
+        if(cart.length === 0) document.getElementById('checkout-area').classList.add('hidden');
+        updateCashBtns(sum); calcChange();
+    }
+
+    function updateCashBtns(total) {
+        const container = document.getElementById('smart-cash-btns'); container.innerHTML = '';
+        [total, 50, 100, 500, 1000].filter(v => v >= total).forEach(val => {
+            const b = document.createElement('div'); b.className = 'cash-btn'; b.innerText = val === total ? 'พอดี' : val;
+            b.onclick = () => { document.getElementById('cash-in').value = val; calcChange(); };
+            container.appendChild(b);
+        });
+    }
+
+    function calcChange() {
+        const sum = parseInt(document.getElementById('cart-sum').innerText);
+        const cash = parseInt(document.getElementById('cash-in').value) || 0;
+        document.getElementById('change-val').innerText = cash >= sum ? (cash - sum) : 0;
+    }
+
+    function finalizeSale() {
+        if(cart.length === 0) return;
+        history.unshift({
+            id: Date.now(),
+            time: new Date().toLocaleTimeString('th-TH'),
+            date: new Date().toLocaleDateString('th-TH'),
+            items: [...cart],
+            sum: parseInt(document.getElementById('cart-sum').innerText),
+            mode: payMode
+        });
+        localStorage.setItem(DB_ID + '_hist', JSON.stringify(history));
+        cart = []; document.getElementById('cash-in').value = '';
+        document.getElementById('checkout-area').classList.add('hidden');
+        updateStats();
+    }
+
+    function updateStats() {
+        let total = 0, cups = 0, cashSum = 0, transferSum = 0;
+        let salesMap = {};
+        const list = document.getElementById('history-list'); list.innerHTML = '';
+        
+        history.forEach((bill, idx) => {
+            total += bill.sum;
+            if(bill.mode === 'transfer') transferSum += bill.sum; else cashSum += bill.sum;
+            
+            let itemsHtml = bill.items.map(it => {
+                cups += it.q;
+                salesMap[it.n] = (salesMap[it.n] || 0) + it.q;
+                return `
+                <div class="receipt-item-row">
+                    <div class="receipt-item-info">
+                        <div><b>${it.n}</b> x ${it.q}</div>
+                        <div style="font-size:0.85em; opacity:0.6;">หวาน ${it.s} | + ${it.tN}</div>
+                    </div>
+                    <div class="receipt-item-price">${it.total}.-</div>
+                </div>`;
+            }).join('');
+
+            list.innerHTML += `
+                <div class="receipt-card ${bill.mode}-side">
+                    <div class="receipt-header">
+                        <div><span class="pay-badge badge-${bill.mode}">${bill.mode.toUpperCase()}</span><small style="opacity:0.5; margin-left:5px;">#${bill.id.toString().slice(-4)}</small></div>
+                        <div style="font-size:0.8em; font-weight:500;">${bill.time}</div>
+                    </div>
+                    <div class="receipt-items-list">${itemsHtml}</div>
+                    <div class="receipt-footer">
+                        <button class="void-btn" onclick="voidBill(${idx})">ยกเลิกบิล</button>
+                        <div style="text-align:right;"><small style="opacity:0.6;">ยอดสุทธิ</small><br><b>฿ ${bill.sum}</b></div>
+                    </div>
+                </div>`;
+        });
+
+        document.getElementById('rev-total').innerText = total.toLocaleString();
+        document.getElementById('rev-cups').innerText = cups.toLocaleString();
+        document.getElementById('sub-cash').innerText = cashSum.toLocaleString();
+        document.getElementById('sub-transfer').innerText = transferSum.toLocaleString();
+
+        const reportBody = document.getElementById('menu-report-body'); reportBody.innerHTML = '';
+        const sortedSales = Object.entries(salesMap).sort((a, b) => b[1] - a[1]);
+        if(sortedSales.length === 0) reportBody.innerHTML = '<tr><td colspan="2" style="text-align:center;">-</td></tr>';
+        else sortedSales.forEach(([name, count]) => { reportBody.innerHTML += `<tr><td>${name}</td><td style="text-align:right; font-weight:600;">${count}</td></tr>`; });
+    }
+
+    function voidBill(idx) { if(confirm('ยกเลิกบิลนี้? ยอดขายจะหายไปหมด')) { history.splice(idx, 1); localStorage.setItem(DB_ID + '_hist', JSON.stringify(history)); updateStats(); } }
+
+    // --- Admin (Accordion) ---
+    function renderAdmin() {
+        const dM = document.getElementById('admin-menu-manage'); dM.innerHTML = '';
+        Object.keys(drinks).forEach((cat, catIdx) => {
+            const collId = `admin-cat-coll-${catIdx}`;
+            const iconId = `admin-cat-icon-${catIdx}`;
+            let html = `
+            <div class="admin-card">
+                <div class="admin-cat-header" onclick="toggleColl('${collId}', '${iconId}')">
+                    <span>📂 ${cat}</span>
+                    <div><span class="btn-sm" onclick="event.stopPropagation(); renameCategory('${cat}')">แก้ชื่อ</span><span id="${iconId}" style="margin-left:10px;">▼</span></div>
+                </div>
+                <div id="${collId}" class="coll-content collapsed"><div style="padding:10px;">`;
+            drinks[cat].forEach((m, idx) => {
+                html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #eee;">
+                    <span>${m.n} (<b>${m.p}.-</b>)</span>
+                    <div><span class="btn-sm" onclick="triggerImgUpload('drink','${cat}',${idx})">📷</span><span class="btn-sm" onclick="editMenuItem('${cat}',${idx})">แก้</span><span class="btn-sm" style="color:red;" onclick="deleteMenuItem('${cat}',${idx})">ลบ</span></div>
+                </div>`;
+            });
+            html += `<button class="btn-full" style="background:var(--accent); color:var(--primary); padding:10px; font-size:0.8em;" onclick="addMenuItem('${cat}')">+ เพิ่มเมนู</button></div></div></div>`;
+            dM.innerHTML += html;
+        });
+
+        const tM = document.getElementById('admin-top-manage'); tM.innerHTML = '';
+        toppings.forEach((t, idx) => {
+            tM.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee;"><span>${t.n} (<b>${t.p}.-</b>)</span><div><span class="btn-sm" onclick="triggerImgUpload('topping','',${idx})">📷</span><span class="btn-sm" onclick="editTopAdmin(${idx})">แก้</span><span class="btn-sm" style="color:red;" onclick="deleteTopAdmin(${idx})">ลบ</span></div></div>`;
+        });
+    }
+
+    function addCategory() { const n = prompt("ชื่อหมวดหมู่ใหม่:"); if(n && !drinks[n]) { drinks[n] = []; saveData(); renderAdmin(); } }
+    function renameCategory(o) { const n = prompt("ชื่อใหม่:", o); if(n && n!==o) { drinks[n] = drinks[o]; delete drinks[o]; saveData(); renderAdmin(); } }
+    function deleteCategory(c) { if(confirm(`ลบหมวด ${c}?`)) { delete drinks[c]; saveData(); renderAdmin(); } }
+    function addMenuItem(c) { const n = prompt("ชื่อเมนู:"); const p = prompt("ราคา:"); if(n && p) { drinks[c].push({ n, p: parseInt(p) }); saveData(); renderAdmin(); } }
+    function editMenuItem(c, i) { const n = prompt("ชื่อเมนู:", drinks[c][i].n); const p = prompt("ราคา:", drinks[c][i].p); if(n && p) { drinks[c][i].n = n; drinks[c][i].p = parseInt(p); saveData(); renderAdmin(); } }
+    function deleteMenuItem(c, i) { if(confirm("ลบ?")) { drinks[c].splice(i, 1); saveData(); renderAdmin(); } }
+    function addTopAdmin() { const n = prompt("ชื่อ:"); const p = prompt("ราคา:"); if(n && p) { toppings.push({ n, p: parseInt(p) }); saveData(); renderAdmin(); } }
+    function editTopAdmin(i) { const n = prompt("ชื่อ:", toppings[i].n); const p = prompt("ราคา:", toppings[i].p); if(n && p) { toppings[i].n = n; toppings[i].p = parseInt(p); saveData(); renderAdmin(); } }
+    function deleteTopAdmin(i) { if(confirm("ลบ?")) { toppings.splice(i, 1); saveData(); renderAdmin(); } }
+
+    function triggerImgUpload(type, cat, idx) { targetUpload = { type, cat, idx }; document.getElementById('img-input').click(); }
+    function handleImgSelected(input) {
+        const file = input.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            if(targetUpload.type === 'drink') drinks[targetUpload.cat][targetUpload.idx].img = e.target.result;
+            else toppings[targetUpload.idx].img = e.target.result;
+            saveData(); renderAdmin();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function saveData() { localStorage.setItem(DB_ID + '_menu', JSON.stringify(drinks)); localStorage.setItem(DB_ID + '_tops', JSON.stringify(toppings)); }
+    function resetDay() { if(confirm('ล้างยอดขาย?')) { history = []; localStorage.setItem(DB_ID + '_hist', '[]'); updateStats(); } }
+    function resetToDefault() { if(confirm('รีเซ็ตเมนู?')) { drinks = initialMenu; saveData(); renderAdmin(); } }
+    function exportExcel() {
+        let csv = "\uFEFFวันที่,เวลา,เมนู,หวาน,ท็อปปิ้ง,ประเภทชำระ,ยอดรวม\n";
+        history.forEach(b => b.items.forEach(it => csv += `${b.date},${b.time},${it.n},${it.s},${it.tN},${b.mode === 'cash' ? 'สด' : 'โอน'},${it.total}\n`));
+        const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Report_Full_v30.csv`; a.click();
+    }
+
+    function setTheme(t) { currentTheme = t; localStorage.setItem(DB_ID + '_theme', t); document.body.className = (t==='blue'?'':'theme-'+t); }
+    setTheme(currentTheme); renderPOS();
+</script>
+</body>
+</html>
